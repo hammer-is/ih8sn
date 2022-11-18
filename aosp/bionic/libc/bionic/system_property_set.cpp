@@ -38,17 +38,19 @@
 #include <sys/uio.h>
 #include <sys/un.h>
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <sys/_system_properties.h>
+//#include <sys/_system_properties.h>
+#include <_system_properties.h>
 #include <unistd.h>
 
 #include <async_safe/log.h>
-#include <async_safe/CHECK.h>
 
 #include "private/bionic_defs.h"
 #include "private/bionic_macros.h"
 
 static const char property_service_socket[] = "/dev/socket/" PROP_SERVICE_NAME;
 static const char* kServiceVersionPropertyName = "ro.property_service.version";
+
+#define CHECK(x)  /* NOP */
 
 class PropertyServiceConnection {
  public:
@@ -228,7 +230,7 @@ static int send_prop_msg(const prop_msg* msg) {
 static constexpr uint32_t kProtocolVersion1 = 1;
 static constexpr uint32_t kProtocolVersion2 = 2;  // current
 
-static atomic_uint_least32_t g_propservice_protocol_version = 0;
+static atomic_uint_least32_t g_propservice_protocol_version(0);
 
 static void detect_protocol_version() {
   char value[PROP_VALUE_MAX];

@@ -110,6 +110,7 @@ class prop_area {
 
   const prop_info* find(const char* name);
   bool add(const char* name, unsigned int namelen, const char* value, unsigned int valuelen);
+  bool rm(const char *name, bool trim_node);
 
   bool foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
 
@@ -135,6 +136,12 @@ class prop_area {
   prop_info* to_prop_info(atomic_uint_least32_t* off_p);
 
   prop_bt* root_node();
+
+  /* resetprop new: traverse through the trie and find the node */
+  prop_bt *find_prop_bt(prop_bt *const bt, const char* name, bool alloc_if_needed);
+
+  /* resetprop new: trim unneeded nodes from trie */
+  bool prune_node(prop_bt *const node);
 
   prop_bt* find_prop_bt(prop_bt* const bt, const char* name, uint32_t namelen, bool alloc_if_needed);
 

@@ -119,6 +119,7 @@ prop_area* prop_area::map_fd_ro(const int fd) {
   pa_size_ = fd_stat.st_size;
   pa_data_size_ = pa_size_ - sizeof(prop_area);
 
+  /* resetprop: add PROT_WRITE */
   void* const map_result = mmap(nullptr, pa_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (map_result == MAP_FAILED) {
     return nullptr;
@@ -134,6 +135,7 @@ prop_area* prop_area::map_fd_ro(const int fd) {
 }
 
 prop_area* prop_area::map_prop_area(const char* filename) {
+  /* resetprop: O_RDONLY -> O_RDWR */
   int fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);
   if (fd == -1) return nullptr;
 
@@ -272,13 +274,13 @@ prop_bt* prop_area::find_prop_bt(prop_bt* const bt, const char* name, uint32_t n
   }
 }
 
-const prop_info* prop_area::find_property(prop_bt* const trie, const char* name, uint32_t namelen,
-                                          const char* value, uint32_t valuelen,
-                                          bool alloc_if_needed) {
-  if (!trie) return nullptr;
+/* resetprop new: traverse through the trie and find the node.
+ * This was originally part of prop_area::find_property. */
+prop_bt *prop_area::find_prop_bt(prop_bt *const bt, const char *name, bool alloc_if_needed) {
+  if (!bt) return nullptr;
 
   const char* remaining_name = name;
-  prop_bt* current = trie;
+  prop_bt* current = bt;
   while (true) {
     const char* sep = strchr(remaining_name, '.');
     const bool want_subtree = (sep != nullptr);
@@ -313,6 +315,16 @@ const prop_info* prop_area::find_property(prop_bt* const trie, const char* name,
 
     remaining_name = sep + 1;
   }
+  return current;
+}
+
+/* resetprop: move trie traversal logic out of the function */
+const prop_info* prop_area::find_property(prop_bt* const trie, const char* name, uint32_t namelen,
+                                          const char* value, uint32_t valuelen,
+                                          bool alloc_if_needed) {
+  prop_bt* current = find_prop_bt(trie, name, alloc_if_needed);
+  if (!current)
+	  return nullptr;
 
   uint_least32_t prop_offset = atomic_load_explicit(&current->prop, memory_order_relaxed);
   if (prop_offset != 0) {
@@ -366,6 +378,70 @@ const prop_info* prop_area::find(const char* name) {
 bool prop_area::add(const char* name, unsigned int namelen, const char* value,
                     unsigned int valuelen) {
   return find_property(root_node(), name, namelen, value, valuelen, true);
+}
+
+bool prop_area::prune_node(prop_bt * const node) {
+  bool is_leaf = true;
+  if (atomic_load_explicit(&node->children, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->children))) {
+      atomic_store_explicit(&node->children, 0u, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+  if (atomic_load_explicit(&node->left, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->left))) {
+      atomic_store_explicit(&node->left, 0u, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+  if (atomic_load_explicit(&node->right, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->right))) {
+      atomic_store_explicit(&node->right, 0u, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+
+  if (is_leaf && atomic_load_explicit(&node->prop, memory_order_relaxed) == 0) {
+    // Wipe out this node
+    memset(node->name, 0, node->namelen);
+    memset(node, 0, sizeof(*node));
+    return true;
+  }
+  return false;
+}
+
+bool prop_area::rm(const char *name, bool trim_node) {
+  prop_bt *node = find_prop_bt(root_node(), name, false);
+  if (!node)
+    return false;
+
+  prop_info *info = nullptr;
+  uint_least32_t prop_offset = atomic_load_explicit(&node->prop, memory_order_relaxed);
+  if (prop_offset != 0) {
+    info = to_prop_info(&node->prop);
+  }
+
+  // De-reference the existing property ASAP
+  atomic_store_explicit(&node->prop, 0u, memory_order_release);
+
+  if (info) {
+    // Wipe out the old info
+    if (info->is_long()) {
+      char *value = const_cast<char*>(info->long_value());
+      memset(value, 0, strlen(value));
+    }
+    memset(info->name, 0, strlen(info->name));
+    memset(info, 0, sizeof(*info));
+  }
+
+  if (trim_node) {
+    prune_node(root_node());
+  }
+
+  return true;
 }
 
 bool prop_area::foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {

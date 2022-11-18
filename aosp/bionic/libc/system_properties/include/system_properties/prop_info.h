@@ -30,7 +30,8 @@
 
 #include <stdatomic.h>
 #include <stdint.h>
-#include <sys/system_properties.h>
+//#include <sys/system_properties.h>
+#include "../system_properties.h"
 
 #include "private/bionic_macros.h"
 

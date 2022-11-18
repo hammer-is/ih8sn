@@ -27,7 +27,8 @@
  */
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <sys/_system_properties.h>
+//#include <sys/_system_properties.h>
+#include <_system_properties.h>
 
 #include <system_properties/prop_area.h>
 #include <system_properties/system_properties.h>
@@ -96,6 +97,11 @@ __BIONIC_WEAK_FOR_NATIVE_BRIDGE
 int __system_property_add(const char* name, unsigned int namelen, const char* value,
                           unsigned int valuelen) {
   return system_properties.Add(name, namelen, value, valuelen);
+}
+
+__BIONIC_WEAK_FOR_NATIVE_BRIDGE
+int __system_property_delete(const char *name, bool trim_node) {
+  return system_properties.Delete(name, trim_node);
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
