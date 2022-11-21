@@ -18,6 +18,10 @@ void property_override(std::string name, std::string value, bool add = false) {
     }
 }
 
+std::string rtrim(const std::string &s) {
+    return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
+}
+
 std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::string stage) {
     std::vector<std::tuple<std::string, std::string, std::string>> config;
 
@@ -26,11 +30,14 @@ std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::
     if (std::ifstream file("/system/etc/ih8sn.conf"); file.good()) {
         std::string line;
 
-        while (std::getline(file, line)) {
+        while (std::getline(file, line)) {            
+
             if (line[0] == '#') {
                 continue;
             }
             
+            line = rtrim(line);
+
             if (line.compare(stage) == 0) {
                 found = true;
                 continue;
