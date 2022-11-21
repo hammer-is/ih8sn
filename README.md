@@ -26,24 +26,15 @@ Check the "Releases" section on the right.
 ### 2: [Optional] Configure ih8sn.conf inside the zip for your device
 
 - Modify ih8sn.conf for your device and save it as ih8sn.conf.`<codename>` in etc.
-- Use # or remove it from config to disable spoofing that property. (You don't need to spoof all the properties)
+  - **\#** at the beginning of the line will ignore the contents
+  - no blank lines are allowed
+  - **init**, **boot_completed** are special commands, these are used to group the commands to be executed at either the init stage or the boot_completed stage
+  - **set** uses regex to find matching property names and one command can update multiple properties to the same value. E.g. set,ro\\.(|boot\\.|bootimage\\.)theend=123 will match ro.theend, ro.boot.theend and ro.bootimage.theend and set all found properties to 123.
+  - **add** updates a property or inserts it if it does not exists.
+  - **replace** searches for regex matches in the value of all properties. E.g. replace,userdebug=user will replace the substring userdebug with user in all properties. If multiple replace commands are used they will be applied on after another making it possible to replace multiple substrings in same property value.
+  - **delete** uses regex to find all properties with matching names and delete them. E.g. delete,.\*unsafe.\* will delete all propeties containing the text unsafe like ro.someunsafe.property and ro.boot.unsafe.theend.
 
-Example :
-
-```
-BUILD_FINGERPRINT=OnePlus/OnePlus7Pro_EEA/OnePlus7Pro:10/QKQ1.190716.003/1910071200:user/release-keys
-BUILD_DESCRIPTION=OnePlus7Pro-user 10 QKQ1.190716.003 1910071200 release-keys
-BUILD_SECURITY_PATCH_DATE=2019-09-05
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-BUILD_VERSION_RELEASE=10
-BUILD_VERSION_RELEASE_OR_CODENAME=10
-DEBUGGABLE=0
-MANUFACTURER_NAME=OnePlus
-PRODUCT_NAME=OnePlus7Pro
-```
-
-### 3: Push the files to your device
+### 3: Push the files to your device (and optionally test the .conf used)
 
 #### 1. ADB root
 ```
@@ -60,7 +51,11 @@ Linux :
 ```
 ./push.sh
 ```
-
+Optional testing that will output to command line
+```
+adb shell "system/bin/ih8sn init"
+adb shell "system/bin/ih8sn boot_completed"
+```
 #### 2. Recovery method
 ```
 Reboot to recovery and select Apply update -> Apply from ADB
