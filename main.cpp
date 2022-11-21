@@ -1,28 +1,27 @@
 #include <fstream>
-#include <map>
+#include <iostream>
 #include <vector>
+#include <regex>
+#include <ctime>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <sys/_system_properties.h>
+#include "_system_properties.h"
+#include "properties.h"
 
-void property_override(char const prop[], char const value[], bool add = false) {
-    auto pi = (prop_info *) __system_property_find(prop);
+void property_override(std::string name, std::string value, bool add = false) {
+    auto pi = (prop_info *) __system_property_find(name.c_str());
 
     if (pi != nullptr) {
-        __system_property_update(pi, value, strlen(value));
+        __system_property_update(pi, value.c_str(), value.length());
     } else if (add) {
-        __system_property_add(prop, strlen(prop), value, strlen(value));
+        __system_property_add(name.c_str(), name.length(), value.c_str(), value.length());
     }
 }
 
-void property_override(const std::vector<std::string> &props, char const value[], bool add = false) {
-    for (const auto &prop : props) {
-        property_override(prop.c_str(), value, add);
-    }
-}
+std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::string stage) {
+    std::vector<std::tuple<std::string, std::string, std::string>> config;
 
-std::map<std::string, std::string> load_config() {
-    std::map<std::string, std::string> config;
+    bool found = false;
 
     if (std::ifstream file("/system/etc/ih8sn.conf"); file.good()) {
         std::string line;
@@ -31,9 +30,24 @@ std::map<std::string, std::string> load_config() {
             if (line[0] == '#') {
                 continue;
             }
-
-            if (const auto separator = line.find('='); separator != std::string::npos) {
-                config[line.substr(0, separator)] = line.substr(separator + 1);
+            
+            if (line.compare(stage) == 0) {
+                found = true;
+                continue;
+            }
+            
+            if (found) {
+                if (const auto separator1 = line.find(','); separator1 != std::string::npos) {
+                    if (const auto separator2 = line.substr(separator1 + 1).find('='); separator2 != std::string::npos) {
+                        config.push_back(std::make_tuple(line.substr(0, separator1), line.substr(separator1 + 1, separator2), line.substr(separator1 + separator2 + 2)));
+                    }
+                    else {
+                        config.push_back(std::make_tuple(line.substr(0, separator1), line.substr(separator1 + 1), ""));
+                    }
+                }
+                else {
+                    found = false;
+                }
             }
         }
     }
@@ -41,27 +55,42 @@ std::map<std::string, std::string> load_config() {
     return config;
 }
 
-std::vector<std::string> property_list(const std::string &prefix, const std::string &suffix) {
-    std::vector<std::string> props;
+static void handle_existing_prop(const char* name, const char* value, void* cookie) {
 
-    for (const std::string &part : {
-        "",
-        "boot.",
-        "bootimage.",
-        "odm_dlkm.",
-        "odm.",
-        "oem.",
-        "product.",
-        "system_ext.",
-        "system.",
-        "vendor_dlkm.",
-        "vendor.",
-        "vendor.boot.",
-    }) {
-        props.emplace_back(prefix + part + suffix);
+    std::vector<std::tuple<std::string, std::string, std::string>> *config = static_cast<std::vector<std::tuple<std::string, std::string, std::string>>*>(cookie);
+
+    std::string newvalue = value;
+    bool del = false;
+
+    for(std::tuple<std::string, std::string, std::string> i : *config) {
+
+        if (std::get<0>(i).compare("set") == 0) {
+            if (std::regex_match(name, std::regex(std::get<1>(i)))) {
+                newvalue = std::get<2>(i);
+            }
+        }
+        else if (std::get<0>(i).compare("replace") == 0) {
+            if (std::regex_search(newvalue, std::regex(std::get<1>(i)))) {
+                newvalue = std::regex_replace(newvalue, std::regex(std::get<1>(i)), std::get<2>(i));
+            }
+        }
+        else if (std::get<0>(i).compare("delete") == 0) {
+            if (std::regex_match(name, std::regex(std::get<1>(i)))) {
+                del = true;
+            }
+        }   
     }
 
-    return props;
+    if (del)
+    {       
+        std::cout << "delete: " << name << "=" << value << "\n";
+         __system_property_delete(name, false);
+    }
+    else if (newvalue.compare(value) != 0)
+    {
+        std::cout << "set: " << name << "=" << newvalue << "\n";
+        property_override(name, newvalue);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -73,78 +102,21 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    const auto is_init_stage = strcmp(argv[1], "init") == 0;
-    const auto is_boot_completed_stage = strcmp(argv[1], "boot_completed") == 0;
+    std::time_t result = std::time(nullptr);
+    std::cout << "ih8sn stage=" << argv[1] << " " << std::asctime(std::localtime(&result));
 
-    const auto config = load_config();
-    const auto build_fingerprint = config.find("BUILD_FINGERPRINT");
-    const auto build_description = config.find("BUILD_DESCRIPTION");
-    const auto build_security_patch_date = config.find("BUILD_SECURITY_PATCH_DATE");
-    const auto build_tags = config.find("BUILD_TAGS");
-    const auto build_type = config.find("BUILD_TYPE");
-    const auto build_version_release = config.find("BUILD_VERSION_RELEASE");
-    const auto build_version_release_or_codename = config.find("BUILD_VERSION_RELEASE_OR_CODENAME");
-    const auto debuggable = config.find("DEBUGGABLE");
-    const auto manufacturer_name = config.find("MANUFACTURER_NAME");
-    const auto product_name = config.find("PRODUCT_NAME");
+    const auto config = load_config(argv[1]);
 
-    if (is_init_stage && build_fingerprint != config.end()) {
-        property_override(property_list("ro.", "build.fingerprint"),
-                build_fingerprint->second.c_str());
-    }
+    std::cout << config.size() << " config entries\n";
 
-    if (is_init_stage && build_tags != config.end()) {
-        property_override(property_list("ro.", "build.tags"), build_tags->second.c_str());
-    }
+    property_list(handle_existing_prop, (void *)&config);
 
-    if (is_init_stage && build_type != config.end()) {
-        property_override(property_list("ro.", "build.type"), build_type->second.c_str());
-    }
+    for(std::tuple<std::string, std::string, std::string> i : config) {
 
-    if (is_boot_completed_stage && build_version_release != config.end()) {
-        property_override(property_list("ro.", "build.version.release"),
-                build_version_release->second.c_str());
-    }
-
-    if (is_boot_completed_stage && build_version_release_or_codename != config.end()) {
-        property_override(property_list("ro.", "build.version.release_or_codename"),
-                build_version_release_or_codename->second.c_str());
-    }
-
-    if (is_init_stage && build_description != config.end()) {
-        property_override("ro.build.description", build_description->second.c_str());
-    }
-
-    if (is_boot_completed_stage && build_security_patch_date != config.end()) {
-        property_override("ro.build.version.security_patch",
-                build_security_patch_date->second.c_str());
-    }
-
-    if (is_init_stage && debuggable != config.end()) {
-        property_override("ro.debuggable", debuggable->second.c_str());
-    }
-
-    if (is_init_stage) {
-        property_override("ro.secure", "1");
-    }
-
-    if (is_init_stage && manufacturer_name != config.end()) {
-        property_override(property_list("ro.product.", "manufacturer"),
-                manufacturer_name->second.c_str());
-    }
-
-    if (is_init_stage && product_name != config.end()) {
-        property_override(property_list("ro.product.", "name"), product_name->second.c_str());
-    }
-
-    if (is_boot_completed_stage) {
-        property_override("ro.boot.flash.locked", "1");
-        property_override("ro.boot.vbmeta.device_state", "locked");
-        property_override("vendor.boot.vbmeta.device_state", "locked");
-        property_override("ro.boot.verifiedbootstate", "green");
-        property_override("vendor.boot.verifiedbootstate", "green");
-        property_override("ro.boot.veritymode", "enforcing");
-        property_override(property_list("ro.", "warranty_bit"), "0");
+        if (std::get<0>(i).compare("add") == 0) {
+            std::cout << "add: " << std::get<1>(i) << "=" << std::get<2>(i) + "\n";
+            property_override(std::get<1>(i), std::get<2>(i), true);            
+        }
     }
 
     return 0;

@@ -19,6 +19,9 @@ if (!(Test-Path -Path "android-ndk")) {
     -Iaosp/bionic/libc/system_properties/include `
     -Iaosp/system/core/base/include `
     -Iaosp/system/core/property_service/libpropertyinfoparser/include `
+    -Iaosp/system/core/libcutils/include `
+    -Iaosp/system/core/libcutils/include/cutils `
+    -Iaosp/system/libbase/include/properties `
     aosp/bionic/libc/bionic/system_property_api.cpp `
     aosp/bionic/libc/bionic/system_property_set.cpp `
     aosp/bionic/libc/system_properties/context_node.cpp `
@@ -29,6 +32,7 @@ if (!(Test-Path -Path "android-ndk")) {
     aosp/bionic/libc/system_properties/system_properties.cpp `
     aosp/system/core/base/strings.cpp `
     aosp/system/core/property_service/libpropertyinfoparser/property_info_parser.cpp `
+    aosp/system/core/libcutils/properties.cpp `
     main.cpp -static -std=c++17 -o ${out}/ih8sn
 
 read-host "Press any key to exit..."
