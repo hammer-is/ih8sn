@@ -1,10 +1,23 @@
-BUILD_FINGERPRINT=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
-BUILD_DESCRIPTION=H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys
-BUILD_SECURITY_PATCH_DATE=2020-07-01
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-BUILD_VERSION_RELEASE=10
-# BUILD_VERSION_RELEASE_OR_CODENAME=10
-DEBUGGABLE=0
-MANUFACTURER_NAME=Sony
-PRODUCT_NAME=H8324
+init
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)build.fingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)build.tags=release-keys
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)build.type=user
+set,ro\.build\.description=H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys
+set,ro\.product\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)manufacturer=Sony
+set,ro\.product\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)name=H8324
+set,ro\.debuggable=0
+set,ro\.secure=1
+boot_completed
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)build\.version\.release=10
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)build\.version\.release_or_codename=10
+set,ro\.build\.version\.security_patch=2020-07-01
+set,ro\.boot\.flash\.locked=1
+set,ro\.boot\.vbmeta\.device_state=locked
+set,vendor\.boot\.vbmeta\.device_state=locked
+set,ro\.boot\.verifiedbootstate=green
+set,vendor\.boot\.verifiedbootstate=green
+set,ro\.boot\.veritymode=enforcing
+set,ro\.(|boot\.|bootimage\.|odm_dlkm\.|odm\.|oem\.|product\.|system_ext\.|system\.|vendor_dlkm\.|vendor\.|vendor\.boot\.)warranty_bit=0
+replace,userdebug=user
+# add,ro.test=dummy
+# delete,.*unsafe.*
