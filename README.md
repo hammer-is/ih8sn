@@ -53,6 +53,7 @@ Linux :
 ```
 Optional testing that will output to command line
 ```
+adb root
 adb shell "system/bin/ih8sn init"
 adb shell "system/bin/ih8sn boot_completed"
 ```
