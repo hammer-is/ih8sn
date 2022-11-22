@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <regex>
-#include <ctime>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "_system_properties.h"
@@ -111,7 +110,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::time_t result = std::time(nullptr);
-    std::cout << "ih8sn stage=" << argv[1] << " " << std::asctime(std::localtime(&result));
+    std::cout << "ih8sn ("  << __DATE__ << " " << __TIME__ << ") stage=" << argv[1] << "\n";
     if (simulation) {
         std::cout << "*** simulation only, no properties are modified or deleted ***\n";   
     }
