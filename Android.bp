@@ -8,6 +8,9 @@ cc_binary {
         "aosp/bionic/libc/system_properties/include",
         "aosp/system/core/base/include",
         "aosp/system/core/property_service/libpropertyinfoparser/include",
+        "aosp/system/core/libcutils/include",
+        "aosp/system/core/libcutils/include/cutils",
+        "aosp/system/libbase/include/properties",
     ],
 
     srcs: [
