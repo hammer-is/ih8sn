@@ -8,7 +8,7 @@ $ndk_version = "r25b"
 if (!(Test-Path -Path "android-ndk")) {
     if (!(Test-Path "android-ndk-${ndk_version}-windows.zip" -PathType leaf)) {
         echo "Downloading Android NDK"
-        Invoke-WebRequest -Uri "https://dl.google.com/android/repository/android-ndk-${ndk_version}-windows.zip" -OutFile "android-ndk-${ndk_version}-windows.zip"
+        (New-Object Net.WebClient).DownloadFile("https://dl.google.com/android/repository/android-ndk-${ndk_version}-windows.zip", "$PSScriptRoot\android-ndk-${ndk_version}-windows.zip")
     }
     Expand-Archive "android-ndk-${ndk_version}-windows.zip" -DestinationPath .
     Rename-Item "android-ndk-${ndk_version}" "android-ndk"

@@ -8,6 +8,9 @@ while getopts ":-:" o; do
         use_remount)
             USE_REMOUNT=1
             ;;
+        simulation)
+            SIMULATION=1
+            ;;
     esac
 done
 
@@ -24,13 +27,14 @@ fi
 
 if [[ `adb shell ls /system/bin/ih8sn 2> /dev/null` ]]; then
     echo "Removing existing ih8sn files"
-    adb wait-for-device shell "find /system -name *ih8sn* -delete"
+    adb wait-for-device shell "find /system -name '*ih8sn*' -delete"
     read -p "Press any key to exit..." && exit
 fi
 
 adb wait-for-device push system/addon.d/60-ih8sn.sh /system/addon.d/
 adb wait-for-device push system/bin/ih8sn /system/bin/
 adb wait-for-device push system/etc/init/ih8sn.rc /system/etc/init/
+adb wait-for-device push system/etc/ih8sn.common.conf system/etc/
 
 MODEL=$(adb shell getprop ro.product.model)
 SERIALNO=$(adb shell getprop ro.boot.serialno)
@@ -44,6 +48,11 @@ elif [[ -f "system/etc/ih8sn.conf.${PRODUCT}" ]]; then
     adb wait-for-device push system/etc/ih8sn.conf.${PRODUCT} /system/etc/ih8sn.conf
 else
     adb wait-for-device push system/etc/ih8sn.conf /system/etc/
+fi
+
+if [[ "${SIMULATION}" = "1" ]]; then
+    adb wait-for-device shell "system/bin/ih8sn init simulation"
+    adb wait-for-device shell "system/bin/ih8sn boot_completed simulation"
 fi
 
 if [[ "${REBOOT}" = "1" ]]; then

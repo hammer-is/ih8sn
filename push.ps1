@@ -2,7 +2,8 @@
 
 param(
     [switch]$reboot = $false,
-    [switch]$use_remount = $false
+    [switch]$use_remount = $false,
+    [switch]$simulation = $false
 )
 
 adb wait-for-device root
@@ -17,14 +18,15 @@ if ($use_remount) {
 
 if ((adb shell 'ls /system/bin/ih8sn 2> /dev/null') -eq "/system/bin/ih8sn") {
     echo "Removing existing ih8sn files"
-    adb wait-for-device shell "find /system -name *ih8sn* -delete"
-    read-host “Press any key to exit...”
+    adb wait-for-device shell "find /system -name '*ih8sn*' -delete"
+    read-host "Press any key to exit..."
     exit
 }
 
 adb wait-for-device push system/addon.d/60-ih8sn.sh /system/addon.d/
 adb wait-for-device push system/bin/ih8sn /system/bin/
 adb wait-for-device push system/etc/init/ih8sn.rc /system/etc/init/
+adb wait-for-device push system/etc/ih8sn.common.conf system/etc/
 
 $model = adb shell getprop ro.product.model
 $serialno = adb shell getprop ro.boot.serialno
@@ -40,8 +42,13 @@ if (Test-Path "system/etc/ih8sn.conf.${serialno}" -PathType leaf) {
     adb wait-for-device push system/etc/ih8sn.conf /system/etc/
 }
 
+if ($simulation) {
+    adb wait-for-device shell "system/bin/ih8sn init simulation"
+    adb wait-for-device shell "system/bin/ih8sn boot_completed simulation"
+}
+
 if ($reboot) {
     adb wait-for-device reboot
 }
 
-read-host “Press any key to exit...”
+read-host "Press any key to exit..."

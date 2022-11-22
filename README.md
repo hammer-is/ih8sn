@@ -27,8 +27,7 @@ Check the "Releases" section on the right.
 
 - Modify ih8sn.conf for your device and save it as ih8sn.conf.`<codename>` in etc.
   - **\#** at the beginning of the line will ignore the contents
-  - no blank lines are allowed
-  - **init**, **boot_completed** are special commands, these are used to group the commands to be executed at either the init stage or the boot_completed stage
+  - line is prefixed with **init** or **boot_completed** to for the commands to be executed at either the init stage or the boot_completed stage
   - **set** uses regex to find matching property names and one command can update multiple properties to the same value. E.g. set,ro\\.(|boot\\.|bootimage\\.)theend=123 will match ro.theend, ro.boot.theend and ro.bootimage.theend and set all found properties to 123.
   - **add** updates a property or inserts it if it does not exists.
   - **replace** searches for regex matches in the value of all properties. E.g. replace,userdebug=user will replace the substring userdebug with user in all properties. If multiple replace commands are used they will be applied on after another making it possible to replace multiple substrings in same property value.
@@ -45,17 +44,17 @@ Run the script according to your system.
 
 Windows :
 ```
-.\push.ps1
+.\push.ps1 -use_remount -simulation
 ```
 Linux :
 ```
-./push.sh
+./push.sh --use_remount --simulation
 ```
-Optional testing that will output to command line
+**simulation** runs the application in a mode where no properties are changed or deleted but only simulates the changes and outputs to stdout
 ```
 adb root
-adb shell "system/bin/ih8sn init"
-adb shell "system/bin/ih8sn boot_completed"
+adb shell "system/bin/ih8sn init simulation"
+adb shell "system/bin/ih8sn boot_completed simulation"
 ```
 #### 2. Recovery method
 ```
@@ -72,5 +71,5 @@ adb sideload ih8sn*.zip
 ## Notes: 
 ```
 - Run script or flash zip again to uninstall.
-- Spoofing staying in ota updates if rom supports.
+- Spoofing is preserved after ota updates if possible.
 ```

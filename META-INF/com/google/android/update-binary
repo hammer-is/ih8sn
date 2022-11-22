@@ -144,7 +144,7 @@ else
 fi
 
 ui_print "Copying files"
-unzip -qq "$ZIP" system/etc/init/ih8sn.rc system/addon.d/60-ih8sn.sh system/bin/ih8sn -d "${SYSTEM_MNT}/"
+unzip -qq "$ZIP" system/etc/init/ih8sn.rc system/addon.d/60-ih8sn.sh system/bin/ih8sn system/etc/ih8sn.common.conf -d "${SYSTEM_MNT}/"
 
 ui_print "Using ih8sn config: $CONFIG"
 unzip -qqp "$ZIP" $CONFIG > "${SYSTEM_MNT}/$DEFAULT_CONFIG"

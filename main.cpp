@@ -8,6 +8,8 @@
 #include "_system_properties.h"
 #include "properties.h"
 
+bool simulation = false;
+
 void property_override(std::string name, std::string value, bool add = false) {
     auto pi = (prop_info *) __system_property_find(name.c_str());
 
@@ -22,12 +24,10 @@ std::string rtrim(const std::string &s) {
     return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
 }
 
-std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::string stage) {
+std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::string stage, std::string filename) {
     std::vector<std::tuple<std::string, std::string, std::string>> config;
 
-    bool found = false;
-
-    if (std::ifstream file("/system/etc/ih8sn.conf"); file.good()) {
+    if (std::ifstream file(filename); file.good()) {
         std::string line;
 
         while (std::getline(file, line)) {            
@@ -37,13 +37,9 @@ std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::
             }
             
             line = rtrim(line);
-
-            if (line.compare(stage) == 0) {
-                found = true;
-                continue;
-            }
             
-            if (found) {
+            if (line.rfind(stage, 0) == 0) {
+                line = line.substr(stage.length()+1);
                 if (const auto separator1 = line.find(','); separator1 != std::string::npos) {
                     if (const auto separator2 = line.substr(separator1 + 1).find('='); separator2 != std::string::npos) {
                         config.push_back(std::make_tuple(line.substr(0, separator1), line.substr(separator1 + 1, separator2), line.substr(separator1 + separator2 + 2)));
@@ -51,9 +47,6 @@ std::vector<std::tuple<std::string, std::string, std::string>> load_config(std::
                     else {
                         config.push_back(std::make_tuple(line.substr(0, separator1), line.substr(separator1 + 1), ""));
                     }
-                }
-                else {
-                    found = false;
                 }
             }
         }
@@ -91,12 +84,16 @@ static void handle_existing_prop(const char* name, const char* value, void* cook
     if (del)
     {       
         std::cout << "delete: " << name << "=" << value << "\n";
-         __system_property_delete(name, false);
+        if (!simulation) {
+            __system_property_delete(name, false);
+        }
     }
     else if (newvalue.compare(value) != 0)
     {
         std::cout << "set: " << name << "=" << newvalue << "\n";
-        property_override(name, newvalue);
+        if (!simulation) {        
+            property_override(name, newvalue);
+        }
     }
 }
 
@@ -105,16 +102,27 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    if (argc != 2) {
+    if (argc < 2) {
         return -1;
+    }
+    
+    if (argc == 3) {
+        simulation = strcmp(argv[2], "simulation") == 0;
     }
 
     std::time_t result = std::time(nullptr);
     std::cout << "ih8sn stage=" << argv[1] << " " << std::asctime(std::localtime(&result));
+    if (simulation) {
+        std::cout << "*** simulation only, no properties are modified or deleted ***\n";   
+    }
 
-    const auto config = load_config(argv[1]);
+    auto config = load_config(argv[1], "/system/etc/ih8sn.conf");
+    std::cout << config.size() << " .conf entries\n";
 
-    std::cout << config.size() << " config entries\n";
+    auto config2 = load_config(argv[1], "/system/etc/ih8sn.common.conf");
+    std::cout << config2.size() << " .common.conf entries\n";
+
+    std::move(config2.begin(), config2.end(), std::back_inserter(config));
 
     property_list(handle_existing_prop, (void *)&config);
 
@@ -122,7 +130,9 @@ int main(int argc, char *argv[]) {
 
         if (std::get<0>(i).compare("add") == 0) {
             std::cout << "add: " << std::get<1>(i) << "=" << std::get<2>(i) + "\n";
-            property_override(std::get<1>(i), std::get<2>(i), true);            
+            if (!simulation) {
+                property_override(std::get<1>(i), std::get<2>(i), true);
+            }           
         }
     }
 
