@@ -1,5 +1,5 @@
-BUILD_FINGERPRINT=Fairphone/FP3/FP3:10/8901.3.A.0135.20211222/gms-3e31ddee:user/release-keys
-BUILD_SECURITY_PATCH_DATE=2022-01-05
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-DEBUGGABLE=0
+init,set,ro\.(|.*\.)build.fingerprint=Fairphone/FP3/FP3:10/8901.3.A.0135.20211222/gms-3e31ddee:user/release-keys
+boot_completed,set,ro\.build\.version\.security_patch=2022-01-05
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.debuggable=0

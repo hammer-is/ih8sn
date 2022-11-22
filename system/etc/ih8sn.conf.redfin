@@ -1,5 +1,5 @@
-BUILD_FINGERPRINT=google/redfin/redfin:11/RQ3A.211001.001/7641976:user/release-keys
-BUILD_SECURITY_PATCH_DATE=2021-10-01
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-DEBUGGABLE=0
+init,set,ro\.(|.*\.)build.fingerprint=google/redfin/redfin:11/RQ3A.211001.001/7641976:user/release-keys
+boot_completed,set,ro\.build\.version\.security_patch=2021-10-01
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.debuggable=0

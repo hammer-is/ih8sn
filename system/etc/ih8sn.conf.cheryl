@@ -1,6 +1,6 @@
-BUILD_DESCRIPTION=cheryl-user 9 P-MR2-RC001-RZR-N 7083 release-keys
-BUILD_FINGERPRINT=razer/cheryl/cheryl:9/P-MR2-RC001-RZR-N/7083:user/release-keys
-BUILD_SECURITY_PATCH_DATE=2019-11-05
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-DEBUGGABLE=0
+init,set,ro\.build\.description=cheryl-user 9 P-MR2-RC001-RZR-N 7083 release-keys
+init,set,ro\.(|.*\.)build.fingerprint=razer/cheryl/cheryl:9/P-MR2-RC001-RZR-N/7083:user/release-keys
+boot_completed,set,ro\.build\.version\.security_patch=2019-11-05
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.debuggable=0

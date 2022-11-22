@@ -1,7 +1,7 @@
-BUILD_DESCRIPTION=elsa-user 7.0 NRD90M 1801800193678 release-keys
-BUILD_FINGERPRINT=lge/elsa_global_com/elsa:7.0/NRD90M/1801800193678:user/release-keys
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-MANUFACTURER_NAME=LGE
-PRODUCT_NAME=LG-H990
-DEBUGGABLE=0
+init,set,ro\.build\.description=elsa-user 7.0 NRD90M 1801800193678 release-keys
+init,set,ro\.(|.*\.)build.fingerprint=lge/elsa_global_com/elsa:7.0/NRD90M/1801800193678:user/release-keys
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.product\.(|.*\.)manufacturer=LGE
+init,set,ro\.product\.(|.*\.)name=LG-H990
+init,set,ro\.debuggable=0

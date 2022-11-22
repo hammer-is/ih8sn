@@ -1,5 +1,5 @@
-BUILD_FINGERPRINT=Mi/aliothin/aliothin:11/RKQ1.200826.002/V12.5.1.0.RKHINXM:user/release-keys
-BUILD_SECURITY_PATCH_DATE=2021-05-01
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-DEBUGGABLE=0
+init,set,ro\.(|.*\.)build.fingerprint=Mi/aliothin/aliothin:11/RKQ1.200826.002/V12.5.1.0.RKHINXM:user/release-keys
+boot_completed,set,ro\.build\.version\.security_patch=2021-05-01
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.debuggable=0

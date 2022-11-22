@@ -1,7 +1,7 @@
-BUILD_DESCRIPTION=h1-user 7.0 NRD90U 1707917149a1b release-keys
-BUILD_FINGERPRINT=lge/h1_lra_us/h1:7.0/NRD90U/1707917149a1b:user/release-keys
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-MANUFACTURER_NAME=LGE
-PRODUCT_NAME=LG-RS988
-DEBUGGABLE=0
+init,set,ro\.build\.description=h1-user 7.0 NRD90U 1707917149a1b release-keys
+init,set,ro\.(|.*\.)build.fingerprint=lge/h1_lra_us/h1:7.0/NRD90U/1707917149a1b:user/release-keys
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.product\.(|.*\.)manufacturer=LGE
+init,set,ro\.product\.(|.*\.)name=LG-RS988
+init,set,ro\.debuggable=0

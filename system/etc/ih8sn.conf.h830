@@ -1,8 +1,8 @@
-BUILD_DESCRIPTION=h1-user 8.0.0 OPR1.170623.032 182251913485f release-keys
-BUILD_FINGERPRINT=lge/h1_tmo_us/h1:8.0.0/OPR1.170623.032/182251913485f:user/release-keys
-BUILD_SECURITY_PATCH_DATE=2018-08-01
-BUILD_TAGS=release-keys
-BUILD_TYPE=user
-MANUFACTURER_NAME=LGE
-PRODUCT_NAME=LG-H830
-DEBUGGABLE=0
+init,set,ro\.build\.description=h1-user 8.0.0 OPR1.170623.032 182251913485f release-keys
+init,set,ro\.(|.*\.)build.fingerprint=lge/h1_tmo_us/h1:8.0.0/OPR1.170623.032/182251913485f:user/release-keys
+boot_completed,set,ro\.build\.version\.security_patch=2018-08-01
+init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.type=user
+init,set,ro\.product\.(|.*\.)manufacturer=LGE
+init,set,ro\.product\.(|.*\.)name=LG-H830
+init,set,ro\.debuggable=0
