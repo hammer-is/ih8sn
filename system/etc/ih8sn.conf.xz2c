@@ -1,14 +1,12 @@
-init,set,ro\.(|.*\.)build.fingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
-init,set,ro\.(|.*\.)build.tags=release-keys
-init,set,ro\.(|.*\.)build.type=user
-init,set,ro\.build\.description=H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys
-init,set,ro\.product\.(|.*\.)manufacturer=Sony
-init,set,ro\.product\.(|.*\.)name=H8324
+#init,set,ro\.(|.*\.)build.fingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
+#init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.build\.type=user
+init,set,ro\.build\.display\.id=52.1.A.3.49
+#init,set,ro\.build\.description=H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys
+#init,set,ro\.product\.(|.*\.)manufacturer=Sony
+#init,set,ro\.product\.(|.*\.)name=H8324
 init,set,ro\.debuggable=0
 
-boot_completed,set,ro\.(|.*\.)build\.version\.release=10
-boot_completed,set,ro\.(|.*\.)build\.version\.release_or_codename=10
+#boot_completed,set,ro\.(|.*\.)build\.version\.release=10
+#boot_completed,set,ro\.(|.*\.)build\.version\.release_or_codename=10
 boot_completed,set,ro\.build\.version\.security_patch=2020-07-01
-boot_completed,replace,userdebug=user
-boot_completed,replace,lin.age=linage
-#boot_completed,delete,.ro.lin.age.*
