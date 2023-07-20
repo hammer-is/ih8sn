@@ -1,5 +1,5 @@
 #init,set,ro\.(|.*\.)build.fingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
-#init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.(|.*\.)build.tags=release-keys
 init,set,ro\.build\.type=user
 init,set,ro\.build\.display\.id=52.1.A.3.49
 #init,set,ro\.build\.description=H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys
