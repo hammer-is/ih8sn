@@ -1,0 +1,5 @@
+#init,set,ro\.(|.*\.)build.fingerprint=OnePlus/OnePlus3/OnePlus3T:8.0.0/OPR1.170623.032/02281230:user/release-keys
+#init,set,ro\.(|.*\.)build.tags=release-keys
+init,set,ro\.build\.type=user
+init,set,ro\.build\.display\.id=OnePlus3 ih8sn
+init,set,ro\.debuggable=0
